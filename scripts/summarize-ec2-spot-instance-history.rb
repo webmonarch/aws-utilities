@@ -13,6 +13,11 @@
 
 require 'date'
 
+separator = "\t"
+if ARGV.include? "--comma"
+  separator = ','
+end
+
 # convert the spot data into a list of fields
 raw = STDIN.read
 lines = raw.split "\n"
@@ -102,7 +107,7 @@ instance_types.each do |type|
       rows_of_zone = rows_of_os.select { |r| r[ZONE] == zone }
 
       results = [type, os, zone] + summarize_price_information(rows_of_zone).map { |p| "%.5f" % p }
-      puts results.join("\t")
+      puts results.join(sep)
     end
   end
 end
