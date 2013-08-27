@@ -1,0 +1,14 @@
+# Effective price should be scaled by the duration of each actual price
+#
+# So, here, there were 4 15min periods...effective price =
+#    0.50 + 1 + 1 + 1 = 3.50; 3.50 / 4 ==  0.875
+#
+# t = 0  @ 0.50
+# t = 15 @ 1.00
+# t = 60   DONE
+#
+# Expected: m2.2xlarge,Linux/UNIX,us-west-1b,0.50000,1.00000,0.87500
+# Parameters: --comma
+SPOTINSTANCEPRICE	100.00	2013-04-06T17:00:00-0700	m2.2xlarge	Linux/UNIX	us-west-1b
+SPOTINSTANCEPRICE	1.00	2013-04-06T16:15:00-0700	m2.2xlarge	Linux/UNIX	us-west-1b
+SPOTINSTANCEPRICE	0.50	2013-04-06T16:00:00-0700	m2.2xlarge	Linux/UNIX	us-west-1b

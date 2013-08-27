@@ -1,0 +1,11 @@
+# Effective price should be average of two equal price periods
+#
+# t = 0  @ 0.50
+# t = 30  @ 1.00
+# t = 60  @ 100.0
+#
+# Expected: m2.2xlarge,Linux/UNIX,us-west-1b,0.50000,1.00000,0.75000
+# Parameters: --comma
+SPOTINSTANCEPRICE	100.00	2013-04-06T17:00:00-0700	m2.2xlarge	Linux/UNIX	us-west-1b
+SPOTINSTANCEPRICE	1.00	2013-04-06T16:30:00-0700	m2.2xlarge	Linux/UNIX	us-west-1b
+SPOTINSTANCEPRICE	0.50	2013-04-06T16:00:00-0700	m2.2xlarge	Linux/UNIX	us-west-1b

@@ -21,6 +21,7 @@ end
 # convert the spot data into a list of fields
 raw = STDIN.read
 lines = raw.split "\n"
+lines.delete_if { |l| l.strip.empty? || l.match("^#") }
 data = lines.map { |l| l.split "\t" }
 
 # fields (as returned by ec2-describe-spot-price-history)
