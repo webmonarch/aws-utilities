@@ -1,0 +1,7 @@
+/setup-env.ps1
+/setup-env.bat
+
+/.idea/
+
+*~
+*#
