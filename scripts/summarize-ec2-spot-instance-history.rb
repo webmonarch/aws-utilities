@@ -8,7 +8,7 @@
 #
 # Usage:
 #     ec2-describe-spot-price-history | ./summarize-ec2-spot-instance-history.rb
-#     ec2-describe-spot-price-history --region us-west-1 | grep 'Linux/UNIX' | grep -v "Amazon VPC" | ./summarize-ec2-spot-instance-history.rb
+#     ec2-describe-spot-price-history --region us-west-1 -d "Linux/UNIX" | ./summarize-ec2-spot-instance-history.rb
 #
 
 require 'date'
