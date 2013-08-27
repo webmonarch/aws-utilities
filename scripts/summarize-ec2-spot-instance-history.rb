@@ -41,7 +41,7 @@ ZONE = 5
 # inject some types
 data.map do |d|
   d[PRICE] = d[PRICE].to_f
-  d[DATE] = Date.parse d[DATE]
+  d[DATE] = DateTime.parse d[DATE]
 
   d
 end
@@ -72,16 +72,14 @@ def summarize_price_information(arr)
 
 
   arr.each_with_index do |row, index|
-    if index == 0 then next end
+    if index >= (arr.length - 1) then next end
 
     price = row[PRICE]
 
     if price < min_price; min_price = price end
     if price > max_price; max_price = price end
 
-    last_date = arr[index - 1][DATE]    # the date of the last price entry...ensured to be < the current date due to sorting earlier
-    date = row[DATE]                    # the date of the current price entry
-    delta = date - last_date            # the duration between the last price entry and now
+    delta = arr[index + 1][DATE] - arr[index][DATE] # the duration between the last price entry and now
 
     effective_price += (delta / duration) * price   #
   end
