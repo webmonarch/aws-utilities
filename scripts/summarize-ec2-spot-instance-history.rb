@@ -12,11 +12,31 @@
 #
 
 require 'date'
+require 'optparse'
 
-separator = "\t"
-if ARGV.include? "--comma"
-  separator = ','
-end
+#
+# Parse parameters
+#
+
+options = {}
+options[:separator] = "\t"
+options[:summarize] = false
+
+OptionParser.new do |opts|
+  opts.on("--comma", "Separate output with commas (intead of tabs)") do |comma|
+    if comma
+      options[:separator] = ","
+    end
+  end
+  opts.on("--summarize", "Summarizes results for an instance type across all availability zones") do |summarize|
+    options[:summarize] = summarize
+  end
+end.parse!
+
+separator = options[:separator]
+
+display_summary = options[:summarize]
+display_detailed = ! display_summary
 
 # convert the spot data into a list of fields
 raw = STDIN.read
@@ -38,6 +58,7 @@ DATE = 2
 TYPE = 3
 OS = 4
 ZONE = 5
+REGION = 6  # injected below in "Preprocess"
 
 
 #
@@ -49,6 +70,9 @@ data.map do |d|
   d[PRICE] = d[PRICE].to_f
   d[DATE] = DateTime.parse d[DATE]
 
+  # extract region from zone
+  d << d[ZONE][0, (d[ZONE].length - 1)]
+
   d
 end
 data.sort! { |a,b| a[DATE] <=> b[DATE] } # sort by date ascending
@@ -58,10 +82,17 @@ data.sort! { |a,b| a[DATE] <=> b[DATE] } # sort by date ascending
 # Extract unique instance types and zone for summarization
 #
 
+regions = data.map { |l| l[REGION] }.uniq.sort
 instance_types = data.map { |l| l[TYPE] }.uniq.sort
 zones = data.map { |l| l[ZONE] }.uniq.sort
 oses = data.map { |l| l[OS] }.uniq.sort
 
+if regions.length != 1
+  STDERR.puts "Unexpected multiple regions."
+  exit 1
+end
+
+region = regions.first
 
 # Given an array of sorted spot instance pricing information rows,
 # calculate their min, max, and effective price over the duration
@@ -104,11 +135,27 @@ instance_types.each do |type|
   oses.each do |os|
     rows_of_os = rows_of_type.select { |r| r[OS] == os }
 
+    zone_results = []
+    
     zones.each do |zone|
       rows_of_zone = rows_of_os.select { |r| r[ZONE] == zone }
 
-      results = [type, os, zone] + summarize_price_information(rows_of_zone).map { |p| "%.5f" % p }
-      puts results.join(sep)
+      # individual type, os, zone price summary
+      result = [type, os, zone] + summarize_price_information(rows_of_zone).map { |p| "%.5f" % p }
+      if display_detailed
+        puts result.join(separator)
+      end
+
+      # store all price summaries for this configuration for later reporting
+      zone_results << result
     end
+    
+    zone_prices = zone_results.map { |r| r[5].to_f }.select { |p| p > 0 }
+    if zone_prices.length == 0; zone_prices << 0.0 end
+
+    if display_summary
+      puts [type, os, region, zone_prices.minmax, "%.5f" % (zone_prices.reduce(:+) / zone_prices.length)].flatten.join(separator)
+    end
+
   end
 end
