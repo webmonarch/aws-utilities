@@ -77,6 +77,8 @@ data.map do |d|
 end
 data.sort! { |a,b| a[DATE] <=> b[DATE] } # sort by date ascending
 
+start_date = data.first[DATE]
+end_date = data.last[DATE]
 
 #
 # Extract unique instance types and zone for summarization
@@ -98,14 +100,15 @@ region = regions.first
 # calculate their min, max, and effective price over the duration
 #
 # returns [min, max, effective]
-def summarize_price_information(arr)
+def summarize_price_information(arr, end_date = nil)
   if arr.length == 0
     return [0, 0, 0]
   end
 
   min_price = max_price =  arr.first[PRICE]
   effective_price = 0
-  duration = arr.last[DATE] - arr.first[DATE]
+  end_date = arr.last[DATE] unless end_date
+  duration = end_date - arr.first[DATE]
 
 
   arr.each_with_index do |row, index|
@@ -141,7 +144,7 @@ instance_types.each do |type|
       rows_of_zone = rows_of_os.select { |r| r[ZONE] == zone }
 
       # individual type, os, zone price summary
-      result = [type, os, zone] + summarize_price_information(rows_of_zone).map { |p| "%.5f" % p }
+      result = [type, os, zone] + summarize_price_information(rows_of_zone, end_date).map { |p| "%.5f" % p }
       if display_detailed
         puts result.join(separator)
       end
