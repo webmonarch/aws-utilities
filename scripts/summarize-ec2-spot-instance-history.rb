@@ -7,8 +7,8 @@
 # duration.
 #
 # Usage:
-#     ec2-describe-spot-price-history | ./summarize-ec2-spot-instance-history.rb
-#     ec2-describe-spot-price-history --region us-west-1 -d "Linux/UNIX" | ./summarize-ec2-spot-instance-history.rb
+#     aws ec2 describe-spot-price-history --output text | ./summarize-ec2-spot-instance-history.rb
+#     aws ec2 describe-spot-price-history --instance-types m1.xlarge --start-time 2017-01-06T07:08:09 --end-time 2017-01-06T08:09:10 --product-description "Linux/UNIX" --output text | ./summarize-ec2-spot-instance-history.rb
 #
 
 require 'date'
@@ -47,19 +47,18 @@ data = lines.map { |l| l.split "\t" }
 # fields (as returned by ec2-describe-spot-price-history)
 #
 # 0             SPOTINSTANCEPRICE
-# 1 price       0.010000
-# 2 date        2013-02-04T15:14:08-0800
-# 3 type        m1.small
-# 4 OS          Linux/UNIX
-# 5 zone        us-west-1a
+# 1 zone        us-west-1a
+# 2 type        m1.small
+# 3 OS          Linux/UNIX
+# 4 price       0.010000
+# 5 date        2013-02-04T15:14:08-0800
 
-PRICE = 1
-DATE = 2
-TYPE = 3
-OS = 4
-ZONE = 5
+ZONE = 1
+TYPE = 2
+OS = 3
+PRICE = 4
+DATE = 5
 REGION = 6  # injected below in "Preprocess"
-
 
 #
 # Preprocess
